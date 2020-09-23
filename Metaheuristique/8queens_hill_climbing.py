@@ -20,7 +20,7 @@ def show(plate, n):
         print(raw)
 
 # return number of queen conflicts on plate
-def find_conflict(plate):
+def find_conflict(plate, n):
     conflict = 0
     for i in range(n):
         for j in range(n):
@@ -99,46 +99,42 @@ if __name__ == "__main__":
     print('Initial configuration :')
     print('-----------------------')
     show(init_plate, n)
-    e = find_conflict(init_plate)
+    init_error = find_conflict(init_plate, n)
     print('-----------------------')
-    print('Conflicts : ', e)
-    print()
 
-    best_error = [e]
-    loop_counter = 0
 
-    while (e <= min(best_error) and e > 0):
-        
-        errors = []
-        swap = []
-        plate = copy.copy(init_plate)
-        
-        for i in range(n):
-            for j in range(n):
-                new_plate = swap_lines(plate,i,j)
-                e = find_conflict(new_plate)
-                swap.append([i,j])
-                errors.append(e)
-        e = min(errors)
-        if e < best_error[-1]:
-            best_error.append(e)
-            e_idx = errors.index(e)
-            swap = swap[e_idx]
-            l1, l2 = swap[0], swap[1]
-            init_plate = swap_lines(init_plate, l1, l2)
+    error = init_error-1 # to ensure the loop begins
+
+    if init_error > 0:
+        loop_counter = 0
+        while (error < init_error and error > 0):
+            
+            init_error = error
+            errors = []
+            swap = []
+            plate = copy.copy(init_plate)
+            
+            for i in range(n):
+                for j in range(n):
+                    new_plate = swap_lines(plate,i,j)
+                    e = find_conflict(new_plate, n)
+                    swap.append([i,j])
+                    errors.append(e)
+                    plate = copy.copy(init_plate)
+                    del new_plate
+
+            error = min(errors)
+            error_idx = errors.index(error)
+            l1, l2 = swap[error_idx][0], swap[error_idx][1]
+
+            init_plate = swap_lines(plate, l1, l2)
             loop_counter += 1
-            print('BEST SWAP :', l1,'<-->', l2,' GIVES :')
-            show(init_plate, n)
-            if e == 0:
-                print('Conflicts : ', e, ': solution found !')
-                break
-            else:
-                print('Conflicts :', e)
-                print('Loop n°', loop_counter)
-                print()
 
-                # control iterations (optional)
-                input('Press Enter to continue')
-        else:
-            print('No better swap found.')
-            break
+            print('BEST SWAP :', l1, '<--->', l2, 'GIVES :')
+            show(init_plate, n)
+            print('Conflicts :', error/2)
+            print()
+        print('No best swap found !')
+    else:
+        print('Conflict :', init_error/2)
+    

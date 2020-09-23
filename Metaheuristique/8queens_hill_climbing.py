@@ -3,6 +3,7 @@ Algorithm to solve the n-queens problem
 """
 import random
 import copy
+import sys
 
 ############################## FUNCTIONS ###########################
 
@@ -74,7 +75,12 @@ if __name__ == "__main__":
 
     ### INITIALISATION
     # plate size = number of queens
-    n = 16
+    try:
+        n = int(sys.argv[1])
+    except:
+        print('Default size = 8.')
+        n = 8
+    
     # empty plate
     init_plate = [['\u25AB' for i in range(n)] for j in range(n)]
     # Place one queen per column and per raw
